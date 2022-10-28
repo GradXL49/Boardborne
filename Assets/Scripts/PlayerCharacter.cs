@@ -22,9 +22,15 @@ public class PlayerCharacter : MonoBehaviour {
     private float               target;
     private int                 target_direction;
 
-    private int health;
-    private int stamina;
-    private int mana;
+    private int currentHealth;
+    private int maxHealth;
+    private int currentStamina;
+    private int maxStamina;
+    private int currentMana;
+    private int maxMana;
+    private int strength;
+    private int currency;
+    private RestPlace lastRestPlace;
 
 
     // Use this for initialization
@@ -35,6 +41,15 @@ public class PlayerCharacter : MonoBehaviour {
         m_groundSensor = transform.Find("GroundSensor").GetComponent<Sensor_HeroKnight>();
         m_groundSensor_l = transform.Find("GroundSensor_L").GetComponent<Sensor_HeroKnight>();
         m_groundSensor_r = transform.Find("GroundSensor_R").GetComponent<Sensor_HeroKnight>();
+
+        maxHealth = 100;
+        currentHealth = maxHealth/2;
+        maxStamina = 40;
+        currentStamina = maxStamina/2;
+        maxMana = 20;
+        currentMana = maxMana/2;
+        strength = 5;
+        currency = 0;
     }
 
     // Update is called once per frame
@@ -173,5 +188,42 @@ public class PlayerCharacter : MonoBehaviour {
     //get whether the character is moving
     public bool isMoving() {
         return moving;
+    }
+
+    //get current attribute values
+    public Vector3 getStatus() {
+        return new Vector3(currentHealth, currentStamina, currentMana);
+    }
+
+    public Vector3 getMax() {
+        return new Vector3(maxHealth, maxStamina, maxMana);
+    }
+
+    //have the player rest
+    public void rest(RestPlace location) {
+        currentHealth = maxHealth;
+        currentStamina = maxStamina;
+        currentMana = maxMana;
+        lastRestPlace = location;
+    }
+
+    //attack the enemy
+    public void attack(Enemy enemy) {
+        enemy.takeDamage(strength);
+    }
+
+    //take damage from enemy
+    public void takeDamage(int amount) {
+        currentHealth -= amount;
+        if(currentHealth <= 0) die();
+    }
+
+    private void die() {
+
+    }
+
+    //get reward from killing enemy
+    public void getReward(int amount) {
+        currency += amount;
     }
 }

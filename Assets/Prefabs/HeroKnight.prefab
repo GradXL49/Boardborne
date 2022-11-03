@@ -70,6 +70,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6961947575039427346}
   - component: {fileID: 5624244480731212584}
+  - component: {fileID: 1466276345583506143}
   - component: {fileID: 3496250588868340706}
   - component: {fileID: 4368578416443684090}
   - component: {fileID: 7513330123585844848}
@@ -113,6 +114,25 @@ MonoBehaviour:
   m_speed: 4
   m_rollForce: 6
   m_noBlood: 0
+  game: {fileID: 0}
+  lastRestPlace: {fileID: 0}
+--- !u!114 &1466276345583506143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4872137652135333701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f5034bc83802944c9bca57c55e08978, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_speed: 4
+  m_jumpForce: 7.5
+  m_rollForce: 6
+  m_noBlood: 0
+  m_slideDust: {fileID: 0}
 --- !u!95 &3496250588868340706
 Animator:
   serializedVersion: 3

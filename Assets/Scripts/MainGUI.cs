@@ -19,12 +19,20 @@ public class MainGUI : MonoBehaviour
     Texture2D stamina;
     Texture2D mana;
 
+    Rect currencyIcon;
+    Rect currencyArea;
+    Texture2D currency;
+    int currencyTotal;
+    GUIStyle currencyStyle;
+
     GameLogic game;
     GUIStyle textStyle;
     GUIStyle borderStyle;
     [SerializeField] Font customFont;
     Rect typingArea;
     string typing;
+
+    float barSize;
     
     // Start is called before the first frame update
     void Start()
@@ -36,6 +44,14 @@ public class MainGUI : MonoBehaviour
         health = Resources.Load("health") as Texture2D;
         stamina = Resources.Load("stamina") as Texture2D;
         mana = Resources.Load("mana") as Texture2D;
+        currency = Resources.Load("currency") as Texture2D;
+
+        currencyStyle = new GUIStyle();
+        currencyStyle.richText = true;
+        currencyStyle.normal.textColor = Color.white;
+        currencyStyle.alignment = TextAnchor.MiddleRight;
+        currencyStyle.font = customFont;
+        currencyStyle.fontSize = 30;
 
         textStyle = new GUIStyle();
         textStyle.richText = true;
@@ -55,22 +71,25 @@ public class MainGUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        barSize = Screen.height*0.03f;
         updateStatusBars();
         updateTypingArea();
+        updateCurrencyArea();
     }
 
     void OnGUI() {
         drawStatusBars();
         drawTyping();
+        drawCurrencyArea();
     }
 
     void updateStatusBars() {
         max = player.getMax();
         current = player.getStatus();
 
-        healthBar = new Rect(Screen.height*0.05f, Screen.height*0.03f, Screen.width*0.2f*(max.x/100), Screen.height*0.03f);
-        staminaBar = new Rect(Screen.height*0.05f, Screen.height*0.065f, Screen.width*0.2f*(max.y/100), Screen.height*0.03f);
-        manaBar = new Rect(Screen.height*0.05f, Screen.height*0.10f, Screen.width*0.2f*(max.z/100), Screen.height*0.03f);
+        healthBar = new Rect(Screen.height*0.05f, barSize, Screen.width*0.2f*(max.x/100), barSize);
+        staminaBar = new Rect(Screen.height*0.05f, Screen.height*0.065f, Screen.width*0.2f*(max.y/100), barSize);
+        manaBar = new Rect(Screen.height*0.05f, Screen.height*0.10f, Screen.width*0.2f*(max.z/100), barSize);
 
         currentHealth = new Rect(healthBar.x, healthBar.y, healthBar.width*(current.x/max.x), healthBar.height);
         currentStamina = new Rect(staminaBar.x, staminaBar.y, staminaBar.width*(current.y/max.y), staminaBar.height);
@@ -96,5 +115,17 @@ public class MainGUI : MonoBehaviour
         Rect temp = new Rect(typingArea.x-2, typingArea.y-2, typingArea.width, typingArea.height);
         GUI.Label(typingArea, typing, borderStyle);
         GUI.Label(temp, typing, textStyle);
+    }
+
+    void updateCurrencyArea() {
+        currencyTotal = player.getTotalCurrency();
+        currencyIcon = new Rect(Screen.width*0.85f, Screen.height-barSize*2, barSize, barSize);
+        currencyArea = new Rect(currencyIcon.x+currencyIcon.width, currencyIcon.y, Screen.width*0.1f, currencyIcon.height);
+    }
+
+    void drawCurrencyArea() {
+        GUI.DrawTexture(currencyIcon, currency);
+        GUI.DrawTexture(currencyArea, border);
+        GUI.Label(new Rect(currencyArea.x, currencyArea.y, currencyArea.width*0.95f, currencyArea.height), ""+currencyTotal, currencyStyle);
     }
 }

@@ -928,6 +928,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: HeroKnight
       objectReference: {fileID: 0}
+    - target: {fileID: 5624244480731212584, guid: c70118b0fced5704e888d32ef736694d,
+        type: 3}
+      propertyPath: lastRestPlace
+      value: 
+      objectReference: {fileID: 460364601}
     - target: {fileID: 6961947575039427346, guid: c70118b0fced5704e888d32ef736694d,
         type: 3}
       propertyPath: m_RootOrder
@@ -983,7 +988,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1466276345583506143, guid: c70118b0fced5704e888d32ef736694d, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: c70118b0fced5704e888d32ef736694d, type: 3}
 --- !u!1001 &683833302
 PrefabInstance:
@@ -2471,6 +2477,7 @@ MonoBehaviour:
   - {fileID: 1383529299}
   childWords:
   - left
+  delta: 50
   enemy: {fileID: 1247199226}
 --- !u!1001 &1307379352
 PrefabInstance:

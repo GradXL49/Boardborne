@@ -10,6 +10,7 @@ public class Enemy : MonoBehaviour
     int maxHealth;
     [SerializeField] int damage;
     [SerializeField] int reward;
+    int startReward;
     
     // Start is called before the first frame update
     void Start()
@@ -17,6 +18,7 @@ public class Enemy : MonoBehaviour
         player = GameObject.Find("HeroKnight").GetComponent<PlayerCharacter>();
 
         maxHealth = health;
+        startReward = reward;
     }
 
     // Update is called once per frame
@@ -32,6 +34,7 @@ public class Enemy : MonoBehaviour
 
     public void dealDamage() {
         player.takeDamage(damage);
+        if(player.isDead()) reward = startReward + player.punish();
     }
 
     private void die() {

@@ -6,6 +6,7 @@ public class PlayerCharacter : MonoBehaviour {
     [SerializeField] float      m_speed = 4.0f;
     [SerializeField] float      m_rollForce = 6.0f;
     [SerializeField] bool       m_noBlood = false;
+    [SerializeField] GameLogic  game;
 
     private Animator            m_animator;
     private Rigidbody2D         m_body2d;
@@ -30,7 +31,7 @@ public class PlayerCharacter : MonoBehaviour {
     private int maxMana;
     private int strength;
     private int currency;
-    private RestPlace lastRestPlace;
+    public RestPlace lastRestPlace;
 
 
     // Use this for initialization
@@ -41,6 +42,7 @@ public class PlayerCharacter : MonoBehaviour {
         m_groundSensor = transform.Find("GroundSensor").GetComponent<Sensor_HeroKnight>();
         m_groundSensor_l = transform.Find("GroundSensor_L").GetComponent<Sensor_HeroKnight>();
         m_groundSensor_r = transform.Find("GroundSensor_R").GetComponent<Sensor_HeroKnight>();
+        game = GameObject.Find("GameLogic").GetComponent<GameLogic>();
 
         maxHealth = 100;
         currentHealth = maxHealth/2;
@@ -103,13 +105,6 @@ public class PlayerCharacter : MonoBehaviour {
         m_animator.SetFloat("AirSpeedY", m_body2d.velocity.y);
 
         // -- Handle Animations --
-        //Death
-        // if (Input.GetKeyDown("e") && !m_rolling)
-        // {
-        //     m_animator.SetBool("noBlood", m_noBlood);
-        //     m_animator.SetTrigger("Death");
-        // }
-            
         //Hurt
         // else if (Input.GetKeyDown("q") && !m_rolling)
         //     m_animator.SetTrigger("Hurt");
@@ -210,20 +205,70 @@ public class PlayerCharacter : MonoBehaviour {
     //attack the enemy
     public void attack(Enemy enemy) {
         enemy.takeDamage(strength);
+        
+        if(m_timeSinceAttack > 0.25f) {
+            m_currentAttack++;
+
+            // Loop back to one after third attack
+            if (m_currentAttack > 3)
+                m_currentAttack = 1;
+
+            // Reset Attack combo if time since last attack is too large
+            if (m_timeSinceAttack > 1.0f)
+                m_currentAttack = 1;
+
+            // Call one of three attack animations "Attack1", "Attack2", "Attack3"
+            m_animator.SetTrigger("Attack" + m_currentAttack);
+
+            // Reset timer
+            m_timeSinceAttack = 0.0f;
+        }
     }
 
     //take damage from enemy
     public void takeDamage(int amount) {
         currentHealth -= amount;
-        if(currentHealth <= 0) die();
+        if(currentHealth <= 0) {
+            currentHealth = 0;
+            m_animator.SetBool("noBlood", m_noBlood);
+            m_animator.SetTrigger("Death");
+            Invoke("sendDeathTrigger", 1f);
+        }
+        else m_animator.SetTrigger("Hurt");
     }
 
-    private void die() {
-
+    void sendDeathTrigger() {
+        game.deathTrigger();
     }
 
     //get reward from killing enemy
     public void getReward(int amount) {
         currency += amount;
+    }
+
+    //get total amount of currency
+    public int getTotalCurrency() {
+        return currency;
+    }
+
+    //check if dead
+    public bool isDead() {
+        return currentHealth == 0;
+    }
+
+    //take away currency
+    public int punish() {
+        int current = currency;
+        currency = 0;
+        return current;
+    }
+
+    //reset after death
+    public void reset() {
+        Vector2 respawn = lastRestPlace.getLocation();
+        transform.SetPositionAndRotation(new Vector3(respawn.x, respawn.y, transform.position.z), transform.rotation);
+        rest(lastRestPlace);
+        m_animator.Rebind();
+        m_animator.Update(0f);
     }
 }

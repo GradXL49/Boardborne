@@ -11,9 +11,12 @@ public class GameLogic : MonoBehaviour
 
     GUIStyle textStyle;
     GUIStyle borderStyle;
+    GUIStyle deathStyle;
     [SerializeField] Font customFont;
 
     string combatWord;
+    bool playerDied;
+    bool showDeathOptions;
     
     // Start is called before the first frame update
     void Start()
@@ -21,6 +24,8 @@ public class GameLogic : MonoBehaviour
         player = GameObject.Find("HeroKnight").GetComponent<PlayerCharacter>();
         typing = "";
         combatWord = "attack";
+        playerDied = false;
+        showDeathOptions = false;
 
         textStyle = new GUIStyle();
         textStyle.richText = true;
@@ -33,6 +38,13 @@ public class GameLogic : MonoBehaviour
         borderStyle.normal.textColor = Color.white;
         borderStyle.alignment = TextAnchor.MiddleCenter;
         borderStyle.font = customFont;
+
+        deathStyle = new GUIStyle();
+        deathStyle.richText = true;
+        deathStyle.normal.textColor = Color.red;
+        deathStyle.alignment = TextAnchor.MiddleCenter;
+        deathStyle.font = customFont;
+        deathStyle.fontSize = 100;
     }
 
     // Update is called once per frame
@@ -46,20 +58,49 @@ public class GameLogic : MonoBehaviour
                 typing += Input.inputString;
             }
         }
-
-        if(currentLocation.GetType() == typeof(RestPlace)) {
-            resting();
-        }
-        else if(currentLocation.GetType() == typeof(EnemyLocation)) {
-            combat();
-        }
         
-        for(int i=0; i<currentLocation.childWords.Count; i++) {
-            if(typing == currentLocation.childWords[i]) {
-                player.moveTo(currentLocation.children[i].getLocation().x);
+        if(playerDied && showDeathOptions) {
+            if(typing == "respawn") {
                 typing = "";
-                currentLocation = currentLocation.children[i];
+                playerDied = false;
+                showDeathOptions = false;
+                player.reset();
+                currentLocation = player.lastRestPlace;
+                resurrectEnemies(currentLocation, new List<Location>());
             }
+        }
+        else {
+            if(currentLocation.GetType()==typeof(EnemyLocation) && !((EnemyLocation)currentLocation).enemy.isDead()) {
+                combat();
+            }
+            else {
+                if(currentLocation.GetType() == typeof(RestPlace)) {
+                    resting();
+                }
+
+                for(int i=0; i<currentLocation.childWords.Count; i++) {
+                    if(typing == currentLocation.childWords[i]) {
+                        player.moveTo(currentLocation.children[i].getLocation().x);
+                        typing = "";
+                        currentLocation = currentLocation.children[i];
+                    }
+                }
+            }
+        }
+    }
+
+    //update gui
+    void OnGUI() {
+        if(playerDied) {
+            drawDeathScreen();
+            if(showDeathOptions) drawDeathOptions();
+        }
+        else if(currentLocation.GetType()==typeof(EnemyLocation) && !((EnemyLocation)currentLocation).enemy.isDead()) {
+            drawCombat();
+        }
+        else if(!player.isMoving()) {
+            drawRestPlace();
+            drawAllLocations();
         }
     }
 
@@ -89,7 +130,7 @@ public class GameLogic : MonoBehaviour
     //combat logic
     private void combat() {
         if(typing.Length == combatWord.Length) {
-            for(int i=0; i<typing.Length && !((EnemyLocation)currentLocation).enemy.isDead(); i++) {
+            for(int i=0; i<typing.Length && !((EnemyLocation)currentLocation).enemy.isDead() && !player.isDead(); i++) {
                 if(typing.Substring(i, 1) == combatWord.Substring(i, 1)) {
                     player.attack(((EnemyLocation)currentLocation).enemy);
                 }
@@ -101,17 +142,27 @@ public class GameLogic : MonoBehaviour
         }
     }
 
+    public void deathTrigger() {
+        playerDied = true;
+        Invoke("triggerDeathOptions", 1f);
+    }
+
+    void triggerDeathOptions() {
+        showDeathOptions = true;
+    }
+
+    void drawDeathScreen() {
+        GUI.Label(new Rect(0, 0, Screen.width, Screen.height*0.9f), "YOU MISTYPED", deathStyle);
+    }
+
+    void drawDeathOptions() {
+        //GUI.Label(new Rect(0, Screen.height*0.1f, Screen.width, Screen.height*0.9f), "press SPACE to respawn", borderStyle);
+        drawLocation(new Rect(0, Screen.height*0.1f, Screen.width, Screen.height*0.9f), "respawn");
+    }
+
     //get what's been entered
     public string getTyping() {
         return typing;
-    }
-
-    //update gui
-    void OnGUI() {
-        if(!player.isMoving()) {
-            drawRestPlace();
-            drawAllLocations();
-        }
     }
 
     //draw location text
@@ -156,5 +207,9 @@ public class GameLogic : MonoBehaviour
 
             drawLocation(temp, "rest");
         }
+    }
+
+    void drawCombat() {
+        drawLocation(((EnemyLocation)currentLocation).getCombatArea(), combatWord);
     }
 }

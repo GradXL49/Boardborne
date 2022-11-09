@@ -18,6 +18,10 @@ public class MainGUI : MonoBehaviour
     Texture2D health;
     Texture2D stamina;
     Texture2D mana;
+    int currentItem;
+    Rect itemArea;
+    List<Item> items;
+    List<Texture2D> itemPics;
 
     Rect currencyIcon;
     Rect currencyArea;
@@ -75,12 +79,14 @@ public class MainGUI : MonoBehaviour
         updateStatusBars();
         updateTypingArea();
         updateCurrencyArea();
+        updateInventory();
     }
 
     void OnGUI() {
         drawStatusBars();
         drawTyping();
         drawCurrencyArea();
+        drawInventory();
     }
 
     void updateStatusBars() {
@@ -127,5 +133,34 @@ public class MainGUI : MonoBehaviour
         GUI.DrawTexture(currencyIcon, currency);
         GUI.DrawTexture(currencyArea, border);
         GUI.Label(new Rect(currencyArea.x, currencyArea.y, currencyArea.width*0.95f, currencyArea.height), ""+currencyTotal, currencyStyle);
+    }
+
+    void updateInventory() {
+        if(items == null) {
+            items = player.getItems();
+        }
+
+        itemPics = new List<Texture2D>();
+        for(int i=0; i<items.Count; i++) {
+            itemPics.Add(items[i].getTexture());
+        }
+
+        currentItem = player.getCurrentItem();
+        itemArea = new Rect(healthBar.x, Screen.height-barSize*3, barSize*2, barSize*2);
+    }
+
+    void drawInventory() {
+        GUI.DrawTexture(itemArea, itemPics[currentItem]);
+        
+        int i = currentItem+1;
+        if(i > items.Count-1) i = 0;
+        Rect temp = new Rect(itemArea.x+barSize*2, itemArea.y, barSize, barSize);
+        while(i != currentItem) {
+            GUI.DrawTexture(temp, itemPics[i]);
+            temp = new Rect(temp.x+barSize, temp.y, temp.width, temp.height);
+            
+            i++;
+            if(i > items.Count-1) i = 0;
+        }
     }
 }

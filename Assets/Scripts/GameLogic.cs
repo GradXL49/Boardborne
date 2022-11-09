@@ -58,7 +58,13 @@ public class GameLogic : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!fighting && Input.anyKeyDown) {
+        if(Input.GetKeyDown(KeyCode.LeftShift)) {
+            player.switchItem();
+        }
+        else if(Input.GetKeyDown(KeyCode.Tab)) {
+            player.useEquiped();
+        }
+        else if(!fighting && Input.anyKeyDown) {
             if(Input.GetKeyDown(KeyCode.Backspace)) {
                 if(combatWord == null || player.isDead()) typing = typing.Substring(0, typing.Length-1);
             }

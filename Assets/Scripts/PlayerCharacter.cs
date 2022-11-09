@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerCharacter : MonoBehaviour {
 
@@ -29,9 +30,20 @@ public class PlayerCharacter : MonoBehaviour {
     private int maxStamina;
     private int currentMana;
     private int maxMana;
-    private int strength;
     private int currency;
     public RestPlace lastRestPlace;
+
+    private int level;
+    private int vitality;
+    private int strength;
+    private int endurance;
+    private int faith;
+    private int heal;
+    
+    List<Item> items;
+    private int currentItem;
+    private int healthFlasks;
+    private int staminaFlasks;
 
 
     // Use this for initialization
@@ -44,13 +56,26 @@ public class PlayerCharacter : MonoBehaviour {
         m_groundSensor_r = transform.Find("GroundSensor_R").GetComponent<Sensor_HeroKnight>();
         game = GameObject.Find("GameLogic").GetComponent<GameLogic>();
 
-        maxHealth = 100;
-        currentHealth = maxHealth/2;
-        maxStamina = 40;
-        currentStamina = maxStamina/2;
-        maxMana = 20;
-        currentMana = maxMana/2;
+        level = 0;
+        vitality = 10;
         strength = 5;
+        endurance = 5;
+        faith = 3;
+        
+        healthFlasks = 2;
+        staminaFlasks = 2;
+        items = new List<Item>();
+        items.Add(new HealthFlask(this, healthFlasks, Resources.Load("hflask") as Texture2D, Resources.Load("hflask-empty") as Texture2D));
+        items.Add(new StaminaFlask(this, staminaFlasks, Resources.Load("sflask") as Texture2D, Resources.Load("sflask-empty") as Texture2D));
+        currentItem = 0;
+
+        maxHealth = vitality * 10;
+        currentHealth = maxHealth/2;
+        maxStamina = endurance * 10;
+        currentStamina = maxStamina/2;
+        heal = faith*5;
+        maxMana = 20;
+        currentMana = maxMana;
         currency = 0;
     }
 
@@ -72,7 +97,6 @@ public class PlayerCharacter : MonoBehaviour {
         }
 
         // -- Handle input and movement --
-        // float inputX = Input.GetAxis("Horizontal");
         float inputX = 0;
         if(moving) {
             if(target_direction > 0) inputX = 1;
@@ -103,52 +127,9 @@ public class PlayerCharacter : MonoBehaviour {
 
         //Set AirSpeed in animator
         m_animator.SetFloat("AirSpeedY", m_body2d.velocity.y);
-
-        // -- Handle Animations --
-        //Hurt
-        // else if (Input.GetKeyDown("q") && !m_rolling)
-        //     m_animator.SetTrigger("Hurt");
-
-        //Attack
-        // else if(Input.GetMouseButtonDown(0) && m_timeSinceAttack > 0.25f && !m_rolling)
-        // {
-        //     m_currentAttack++;
-
-        //     // Loop back to one after third attack
-        //     if (m_currentAttack > 3)
-        //         m_currentAttack = 1;
-
-        //     // Reset Attack combo if time since last attack is too large
-        //     if (m_timeSinceAttack > 1.0f)
-        //         m_currentAttack = 1;
-
-        //     // Call one of three attack animations "Attack1", "Attack2", "Attack3"
-        //     m_animator.SetTrigger("Attack" + m_currentAttack);
-
-        //     // Reset timer
-        //     m_timeSinceAttack = 0.0f;
-        // }
-
-        // Block
-        // else if (Input.GetMouseButtonDown(1) && !m_rolling)
-        // {
-        //     m_animator.SetTrigger("Block");
-        //     m_animator.SetBool("IdleBlock", true);
-        // }
-
-        // else if (Input.GetMouseButtonUp(1))
-        //     m_animator.SetBool("IdleBlock", false);
-
-        // Roll
-        // else if (Input.GetKeyDown("left shift") && !m_rolling)
-        // {
-        //     m_rolling = true;
-        //     m_animator.SetTrigger("Roll");
-        //     m_body2d.velocity = new Vector2(m_facingDirection * m_rollForce, m_body2d.velocity.y);
-        // }
             
         //Run
-        /*else*/ if (Mathf.Abs(inputX) > Mathf.Epsilon)
+        if (Mathf.Abs(inputX) > Mathf.Epsilon)
         {
             // Reset timer
             m_delayToIdle = 0.05f;
@@ -163,13 +144,6 @@ public class PlayerCharacter : MonoBehaviour {
                 if(m_delayToIdle < 0)
                     m_animator.SetInteger("AnimState", 0);
         }
-    }
-
-    // Animation Events
-    // Called in end of roll animation.
-    void AE_ResetRoll()
-    {
-        m_rolling = false;
     }
 
     //tell the model to move
@@ -199,6 +173,8 @@ public class PlayerCharacter : MonoBehaviour {
         currentHealth = maxHealth;
         currentStamina = maxStamina;
         currentMana = maxMana;
+        items[0].setCharges(healthFlasks);
+        items[1].setCharges(staminaFlasks);
         lastRestPlace = location;
     }
 
@@ -271,5 +247,43 @@ public class PlayerCharacter : MonoBehaviour {
         rest(lastRestPlace);
         m_animator.Rebind();
         m_animator.Update(0f);
+    }
+
+    //heal
+    public void gainHealth(int x) {
+        if(x < 0) currentHealth += heal;
+        else currentHealth += x;
+        if(currentHealth > maxHealth) currentHealth = maxHealth;
+    }
+
+    //regain stamina
+    public void gainStamina(int x) {
+        if(x < 0) currentStamina += heal;
+        else currentStamina += x;
+        if(currentStamina > maxStamina) currentStamina = maxStamina;
+    }
+
+    //use item
+    public void useEquiped() {
+        if(items[currentItem].getCharges() > 0) {
+            m_animator.SetTrigger("Block");
+            items[currentItem].use();
+        }
+    }
+
+    //switch item
+    public void switchItem() {
+        currentItem++;
+        if(currentItem > items.Count-1) currentItem = 0;
+    }
+
+    //get equiped
+    public int getCurrentItem() {
+        return currentItem;
+    }
+
+    //get inventory
+    public List<Item> getItems() {
+        return items;
     }
 }

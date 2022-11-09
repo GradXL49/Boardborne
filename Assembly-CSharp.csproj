@@ -46,10 +46,13 @@
      <Compile Include="Assets\Scripts\Enemy.cs" />
      <Compile Include="Assets\Scripts\EnemyLocation.cs" />
      <Compile Include="Assets\Scripts\GameLogic.cs" />
+     <Compile Include="Assets\Scripts\HealthFlask.cs" />
+     <Compile Include="Assets\Scripts\Item.cs" />
      <Compile Include="Assets\Scripts\Location.cs" />
      <Compile Include="Assets\Scripts\MainGUI.cs" />
      <Compile Include="Assets\Scripts\PlayerCharacter.cs" />
      <Compile Include="Assets\Scripts\RestPlace.cs" />
+     <Compile Include="Assets\Scripts\StaminaFlask.cs" />
      <None Include="Assets\Artwork\Gothicvania Cemetery Artwork\about.txt" />
      <None Include="Assets\Artwork\EVil Wizard\License.txt" />
      <None Include="Assets\Artwork\Hero Knight - Pixel Art\ColorSwap\Sprites-ColorSwap.shader" />

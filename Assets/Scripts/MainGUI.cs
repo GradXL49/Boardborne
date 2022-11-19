@@ -22,6 +22,7 @@ public class MainGUI : MonoBehaviour
     Rect itemArea;
     List<Item> items;
     List<Texture2D> itemPics;
+    GUIStyle itemStyle;
 
     Rect currencyIcon;
     Rect currencyArea;
@@ -37,6 +38,13 @@ public class MainGUI : MonoBehaviour
     string typing;
 
     float barSize;
+
+    Rect restMenuArea;
+    Rect restMenuTop;
+    List<Rect> tabAreas;
+    Texture2D background;
+    int restTab;
+    List<string> restTabs;
     
     // Start is called before the first frame update
     void Start()
@@ -49,6 +57,7 @@ public class MainGUI : MonoBehaviour
         stamina = Resources.Load("stamina") as Texture2D;
         mana = Resources.Load("mana") as Texture2D;
         currency = Resources.Load("currency") as Texture2D;
+        background = Resources.Load("background") as Texture2D;
 
         currencyStyle = new GUIStyle();
         currencyStyle.richText = true;
@@ -56,6 +65,13 @@ public class MainGUI : MonoBehaviour
         currencyStyle.alignment = TextAnchor.MiddleRight;
         currencyStyle.font = customFont;
         currencyStyle.fontSize = 30;
+
+        itemStyle = new GUIStyle();
+        itemStyle.richText = true;
+        itemStyle.normal.textColor = Color.white;
+        itemStyle.alignment = TextAnchor.LowerRight;
+        itemStyle.font = customFont;
+        itemStyle.fontSize = 30;
 
         textStyle = new GUIStyle();
         textStyle.richText = true;
@@ -80,13 +96,16 @@ public class MainGUI : MonoBehaviour
         updateTypingArea();
         updateCurrencyArea();
         updateInventory();
+        updateRestMenu();
     }
 
     void OnGUI() {
         drawStatusBars();
-        drawTyping();
         drawCurrencyArea();
         drawInventory();
+        drawRestMenu();
+
+        drawTyping();
     }
 
     void updateStatusBars() {
@@ -105,16 +124,16 @@ public class MainGUI : MonoBehaviour
     void drawStatusBars() {
         GUI.DrawTexture(currentHealth, health);
         GUI.DrawTexture(currentStamina, stamina);
-        GUI.DrawTexture(currentMana, mana);
+        //GUI.DrawTexture(currentMana, mana);
         
         GUI.DrawTexture(healthBar, border);
         GUI.DrawTexture(staminaBar, border);
-        GUI.DrawTexture(manaBar, border);
+        //GUI.DrawTexture(manaBar, border);
     }
 
     void updateTypingArea() {
         typing = game.getTyping();
-        typingArea = new Rect(Screen.width/4f, manaBar.y, Screen.width/2, manaBar.height);
+        typingArea = new Rect(Screen.width/4f, staminaBar.y, Screen.width/2, staminaBar.height);
     }
 
     void drawTyping() {
@@ -151,6 +170,7 @@ public class MainGUI : MonoBehaviour
 
     void drawInventory() {
         GUI.DrawTexture(itemArea, itemPics[currentItem]);
+        GUI.Label(itemArea, items[currentItem].getCharges()+"", itemStyle);
         
         int i = currentItem+1;
         if(i > items.Count-1) i = 0;
@@ -162,5 +182,49 @@ public class MainGUI : MonoBehaviour
             i++;
             if(i > items.Count-1) i = 0;
         }
+    }
+
+    private void updateRestMenu() {
+        if(game.playerResting()) {
+            float width = Screen.height*0.8f;
+            restMenuArea = new Rect((Screen.width-width)/2, Screen.height*0.1f, width, width);
+            restMenuTop = new Rect(restMenuArea.x, restMenuArea.y, width*0.98f, width*0.05f);
+
+            restTab = game.getCurrentTab();
+            restTabs = game.getRestTabs();
+            tabAreas = new List<Rect>();
+            float tabWidth = width*0.2f;
+            for(int i=0; i<restTabs.Count; i++) {
+                tabAreas.Add(new Rect(restMenuTop.x+i*tabWidth, restMenuTop.y, tabWidth, restMenuTop.height));
+            }
+        }
+    }
+    
+    private void drawRestMenu() {
+        if(game.playerResting()) {
+            GUI.DrawTexture(restMenuArea, background);
+            GUI.Label(restMenuTop, game.colorWord("exit"), currencyStyle);
+
+            try {
+                for(int i=0; i<restTabs.Count; i++) {
+                    if(i != restTab) GUI.DrawTexture(tabAreas[i], background);
+                    GUI.Label(tabAreas[i], game.colorWord(restTabs[i]), borderStyle);
+                }
+
+                if(restTab == 0) {
+                    drawStatsTab();
+                }
+                else {
+
+                }
+            }
+            catch {
+                //do nothing
+            }
+        }
+    }
+
+    private void drawStatsTab() {
+        
     }
 }

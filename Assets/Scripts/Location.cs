@@ -21,6 +21,19 @@ public class Location : MonoBehaviour
         
     }
 
+    //check if the location has child words
+    public bool hasChildWords() {
+        return (childWords!=null && childWords.Count>0);
+    }
+
+    //receive new child words
+    public void setChildWords(List<string> words) {
+        childWords = new List<string>();
+        for(int i=0; i<words.Count; i++) {
+            childWords.Add(words[i]);
+        }
+    }
+
     //get location for player to move to
     public Vector2 getLocation() {
         return new Vector2(transform.position.x, transform.position.y);

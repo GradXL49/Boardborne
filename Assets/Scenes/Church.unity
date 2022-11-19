@@ -824,7 +824,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.562406, y: 4.547, z: -10}
+  m_LocalPosition: {x: -7.562406, y: 4.047, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1071,6 +1071,7 @@ GameObject:
   - component: {fileID: 748613889}
   - component: {fileID: 748613888}
   - component: {fileID: 748613890}
+  - component: {fileID: 748613891}
   m_Layer: 0
   m_Name: GameLogic
   m_TagString: Untagged
@@ -1090,7 +1091,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd02018572d6a0c4aa871e5dd58b0ee1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 1040103621}
   currentLocation: {fileID: 1927135326}
   typing: 
   customFont: {fileID: 12800000, guid: 07e1642feb847544a9974e10bc31b9d5, type: 3}
@@ -1121,6 +1121,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   customFont: {fileID: 12800000, guid: 07e1642feb847544a9974e10bc31b9d5, type: 3}
+--- !u!114 &748613891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 748613887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 693589bc04e2cba4b906073cf29842bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &757481665
 GameObject:
   m_ObjectHideFlags: 0
@@ -1963,18 +1975,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1000271421}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1040103621 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5624244480731212584, guid: c70118b0fced5704e888d32ef736694d,
-    type: 3}
-  m_PrefabInstance: {fileID: 658910592}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeda54dcab8a02448b6932596641c8bf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1119741897 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7853040782533635362, guid: 9cdd64d46db95cf41b594a72bbb23c99,
@@ -2366,9 +2366,9 @@ MonoBehaviour:
   cam: {fileID: 519420031}
   children:
   - {fileID: 1383529299}
-  childWords:
-  - left
-  delta: 50
+  childWords: []
+  wordDelta: 40
+  healthDelta: -65
   enemy: {fileID: 1247199226}
 --- !u!1001 &1307379352
 PrefabInstance:
@@ -2492,9 +2492,7 @@ MonoBehaviour:
   children:
   - {fileID: 1927135326}
   - {fileID: 1294812366}
-  childWords:
-  - left
-  - right
+  childWords: []
 --- !u!1001 &1384695202
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3515,9 +3513,19 @@ PrefabInstance:
       objectReference: {fileID: 519420031}
     - target: {fileID: 614553967406561520, guid: 7b4cb6f3ff0e83e4c984688c7e5f1987,
         type: 3}
+      propertyPath: childWords.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 614553967406561520, guid: 7b4cb6f3ff0e83e4c984688c7e5f1987,
+        type: 3}
       propertyPath: children.Array.data[0]
       value: 
       objectReference: {fileID: 1927135326}
+    - target: {fileID: 614553967406561520, guid: 7b4cb6f3ff0e83e4c984688c7e5f1987,
+        type: 3}
+      propertyPath: childWords.Array.data[0]
+      value: right
+      objectReference: {fileID: 0}
     - target: {fileID: 614553967406561521, guid: 7b4cb6f3ff0e83e4c984688c7e5f1987,
         type: 3}
       propertyPath: m_RootOrder
@@ -3593,6 +3601,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1294812365}
     m_Modifications:
+    - target: {fileID: 5410942367636213865, guid: bded9f8c852ef4648ba73e51ddc1a73a,
+        type: 3}
+      propertyPath: timeFactor
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7156049538023487992, guid: bded9f8c852ef4648ba73e51ddc1a73a,
         type: 3}
       propertyPath: m_RootOrder
@@ -3799,7 +3812,7 @@ PrefabInstance:
     - target: {fileID: 9030097593564711953, guid: 699bc8927ceaffc44a8d9b3ffa502095,
         type: 3}
       propertyPath: childWords.Array.size
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9030097593564711953, guid: 699bc8927ceaffc44a8d9b3ffa502095,
         type: 3}

@@ -10,6 +10,7 @@ public class Enemy : MonoBehaviour
     int maxHealth;
     [SerializeField] int damage;
     [SerializeField] int reward;
+    public float timeFactor;
     int startReward;
 
     [SerializeField] Animator m_animator;
@@ -69,8 +70,13 @@ public class Enemy : MonoBehaviour
 
     public void resurrect() {
         if(isDead()) {
+            m_animator.SetTrigger("Idle");
             transform.SetPositionAndRotation(start, transform.rotation);
         }
         health = maxHealth;
+    }
+
+    public Vector2 getHealthValues() {
+        return new Vector2(health, maxHealth);
     }
 }

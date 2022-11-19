@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class EnemyLocation : Location
 {
-    [SerializeField] float delta;
+    [SerializeField] float wordDelta;
+    [SerializeField] float healthDelta;
     public Enemy enemy;
     
     // Start is called before the first frame update
@@ -21,6 +22,11 @@ public class EnemyLocation : Location
 
     public Rect getCombatArea() {
         Vector3 enemyLocation = cam.WorldToScreenPoint(enemy.transform.position);
-        return new Rect(enemyLocation.x-10, Screen.height-(enemyLocation.y+delta+10), 20, 20);
+        return new Rect(enemyLocation.x-10, Screen.height-(enemyLocation.y+wordDelta+10), 20, 20);
+    }
+
+    public Rect getHealthArea() {
+        Vector3 enemyLocation = cam.WorldToScreenPoint(enemy.transform.position);
+        return new Rect(enemyLocation.x-10, Screen.height-(enemyLocation.y+healthDelta+10), 20, 20);
     }
 }

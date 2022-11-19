@@ -286,4 +286,15 @@ public class PlayerCharacter : MonoBehaviour {
     public List<Item> getItems() {
         return items;
     }
+
+    //get current stats
+    public List<int> getStats() {
+        List<int> stats = new List<int>();
+        stats.Add(level);
+        stats.Add(vitality);
+        stats.Add(strength);
+        stats.Add(endurance);
+        stats.Add(faith);
+        return stats;
+    }
 }

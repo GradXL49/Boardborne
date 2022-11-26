@@ -8,6 +8,7 @@ public class Location : MonoBehaviour
     [SerializeField] protected Camera cam;
     public List<Location> children;
     public List<string> childWords;
+    public string name;
     
     // Start is called before the first frame update
     void Start()

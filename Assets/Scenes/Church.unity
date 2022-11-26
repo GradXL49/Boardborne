@@ -1072,6 +1072,7 @@ GameObject:
   - component: {fileID: 748613888}
   - component: {fileID: 748613890}
   - component: {fileID: 748613891}
+  - component: {fileID: 748613892}
   m_Layer: 0
   m_Name: GameLogic
   m_TagString: Untagged
@@ -1092,7 +1093,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentLocation: {fileID: 1927135326}
-  typing: 
+  currentArea: Church
   customFont: {fileID: 12800000, guid: 07e1642feb847544a9974e10bc31b9d5, type: 3}
 --- !u!4 &748613889
 Transform:
@@ -1133,6 +1134,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 693589bc04e2cba4b906073cf29842bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &748613892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 748613887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e76998d2087a9284990840eba04ecdb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  customFont: {fileID: 0}
 --- !u!1 &757481665
 GameObject:
   m_ObjectHideFlags: 0
@@ -2367,6 +2381,7 @@ MonoBehaviour:
   children:
   - {fileID: 1383529299}
   childWords: []
+  name: 
   wordDelta: 40
   healthDelta: -65
   enemy: {fileID: 1247199226}
@@ -2493,6 +2508,7 @@ MonoBehaviour:
   - {fileID: 1927135326}
   - {fileID: 1294812366}
   childWords: []
+  name: 
 --- !u!1001 &1384695202
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3513,6 +3529,11 @@ PrefabInstance:
       objectReference: {fileID: 519420031}
     - target: {fileID: 614553967406561520, guid: 7b4cb6f3ff0e83e4c984688c7e5f1987,
         type: 3}
+      propertyPath: name
+      value: Altar
+      objectReference: {fileID: 0}
+    - target: {fileID: 614553967406561520, guid: 7b4cb6f3ff0e83e4c984688c7e5f1987,
+        type: 3}
       propertyPath: childWords.Array.size
       value: 0
       objectReference: {fileID: 0}
@@ -3585,6 +3606,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: RestPlace
+      objectReference: {fileID: 0}
+    - target: {fileID: 614553967406561534, guid: 7b4cb6f3ff0e83e4c984688c7e5f1987,
+        type: 3}
+      propertyPath: m_TagString
+      value: Respawn
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7b4cb6f3ff0e83e4c984688c7e5f1987, type: 3}

@@ -49,6 +49,7 @@
      <Compile Include="Assets\Scripts\HealthFlask.cs" />
      <Compile Include="Assets\Scripts\Item.cs" />
      <Compile Include="Assets\Scripts\Location.cs" />
+     <Compile Include="Assets\Scripts\LocationHandler.cs" />
      <Compile Include="Assets\Scripts\MainGUI.cs" />
      <Compile Include="Assets\Scripts\PlayerCharacter.cs" />
      <Compile Include="Assets\Scripts\RestPlace.cs" />

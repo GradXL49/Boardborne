@@ -7,8 +7,10 @@ public class GameLogic : MonoBehaviour
     //variables
     PlayerCharacter player;
     WordService wordService;
+    LocationHandler locationHandler;
     [SerializeField] Location currentLocation;
-    [SerializeField] string typing;
+    [SerializeField] string currentArea;
+    string typing;
 
     GUIStyle textStyle;
     GUIStyle borderStyle;
@@ -29,16 +31,19 @@ public class GameLogic : MonoBehaviour
     bool resting;
     int restTab;
     List<string> restTabs;
+    bool submitFlag;
     
     // Start is called before the first frame update
     void Start()
     {
         player = GameObject.Find("HeroKnight").GetComponent<PlayerCharacter>();
         wordService = GameObject.Find("GameLogic").GetComponent<WordService>();
+        locationHandler = GameObject.Find("GameLogic").GetComponent<LocationHandler>();
         typing = "";
         combatWord = null;
         playerDied = false;
         showDeathOptions = false;
+        submitFlag = false;
         combatTimerLength = 0;
         timer = Resources.Load("stamina") as Texture2D;
         health = Resources.Load("health") as Texture2D;
@@ -144,6 +149,15 @@ public class GameLogic : MonoBehaviour
         currentLocation = l;
     }
 
+    //handle submitFlag
+    public bool getSubmitFlag() {
+        return submitFlag;
+    }
+
+    public void toggleSubmitFlag() {
+        submitFlag = !submitFlag;
+    }
+
     //rest place logic
     private void rest() {
         if(resting) {
@@ -160,7 +174,10 @@ public class GameLogic : MonoBehaviour
                 }
 
                 if(restTab == 0) {
-                    
+                    if(typing == "submit") {
+                        typing = "";
+                        submitFlag = true;
+                    }
                 }
                 else {
 
@@ -168,6 +185,7 @@ public class GameLogic : MonoBehaviour
             }
         }
         else if(typing == "rest") {
+            locationHandler.visit(currentArea, currentLocation.name);
             resting = true;
             restTab = 0;
             player.rest((RestPlace)currentLocation);
@@ -192,6 +210,10 @@ public class GameLogic : MonoBehaviour
 
     public bool playerResting() {
         return resting;
+    }
+
+    public void toggleResting() {
+        resting = !resting;
     }
 
     public List<string> getRestTabs() {

@@ -39,18 +39,32 @@ public class MainGUI : MonoBehaviour
 
     float barSize;
 
+    GUIStyle menuStyle;
     Rect restMenuArea;
     Rect restMenuTop;
     List<Rect> tabAreas;
     Texture2D background;
     int restTab;
     List<string> restTabs;
+    List<string> statNames;
+    List<int> playerStats;
+    List<int> statDeltas;
+    int levelCost;
+    bool discover;
+    GUIStyle discoverStyle;
+    List<string> areas;
+    List<string> locations;
+    string currentArea;
+    LocationHandler locationHandler;
     
     // Start is called before the first frame update
     void Start()
     {
         player = GameObject.Find("HeroKnight").GetComponent<PlayerCharacter>();
         game = GameObject.Find("GameLogic").GetComponent<GameLogic>();
+        locationHandler = GameObject.Find("GameLogic").GetComponent<LocationHandler>();
+        areas = locationHandler.getAreas();
+        currentArea = areas[0];
 
         border = Resources.Load("border") as Texture2D;
         health = Resources.Load("health") as Texture2D;
@@ -86,6 +100,26 @@ public class MainGUI : MonoBehaviour
         borderStyle.alignment = TextAnchor.MiddleCenter;
         borderStyle.font = customFont;
         borderStyle.fontSize = 50;
+
+        menuStyle = new GUIStyle();
+        menuStyle.richText = true;
+        menuStyle.normal.textColor = Color.white;
+        menuStyle.font = customFont;
+        menuStyle.fontSize = 50;
+
+        discoverStyle = new GUIStyle();
+        discoverStyle.richText = true;
+        discoverStyle.normal.textColor = Color.yellow;
+        discoverStyle.alignment = TextAnchor.MiddleCenter;
+        discoverStyle.font = customFont;
+        discoverStyle.fontSize = 100;
+
+        statNames = new List<string>();
+        statNames.Add("level");
+        statNames.Add("vitality");
+        statNames.Add("strength");
+        statNames.Add("endurance");
+        statNames.Add("faith");
     }
 
     // Update is called once per frame
@@ -186,6 +220,8 @@ public class MainGUI : MonoBehaviour
 
     private void updateRestMenu() {
         if(game.playerResting()) {
+            playerStats = player.getStats();
+            
             float width = Screen.height*0.8f;
             restMenuArea = new Rect((Screen.width-width)/2, Screen.height*0.1f, width, width);
             restMenuTop = new Rect(restMenuArea.x, restMenuArea.y, width*0.98f, width*0.05f);
@@ -197,11 +233,107 @@ public class MainGUI : MonoBehaviour
             for(int i=0; i<restTabs.Count; i++) {
                 tabAreas.Add(new Rect(restMenuTop.x+i*tabWidth, restMenuTop.y, tabWidth, restMenuTop.height));
             }
+
+            if(restTab == 0) {
+                updateStatsTab();
+            }
+            else {
+                if(locations == null) {
+                    locations = locationHandler.getLocations(currentArea);
+                }
+                updateTravelTab();
+            }
+        }
+        else {
+            levelCost = 0;
+            statDeltas = new List<int>();
+            for(int i=0; i<statNames.Count; i++) {
+                statDeltas.Add(0);
+            }
+            locations = null;
+        }
+    }
+
+    private void updateStatsTab() {
+        float col1Width = 225f;
+        float colHeight = 75f;
+        Rect col1 = new Rect(restMenuArea.x+restMenuArea.width*0.05f, restMenuTop.y+restMenuArea.width*0.05f, col1Width, colHeight);
+        Rect col2 = new Rect(col1.x+col1Width, col1.y, colHeight, colHeight);
+        Rect col3 = new Rect(col2.x+colHeight, col2.y, colHeight, colHeight);
+        Rect col4 = new Rect(col3.x+colHeight, col3.y, colHeight, colHeight);
+
+        if(Input.GetMouseButtonUp(0)) {
+            Vector3 mousePos = Input.mousePosition;
+
+            for(int i=0; i<statNames.Count; i++) {
+                col2 = new Rect(col2.x, col2.y+colHeight, colHeight, colHeight);
+                col4 = new Rect(col4.x, col4.y+colHeight, colHeight, colHeight);
+
+                if(i>0 && i<statNames.Count-1) {
+                    if(checkMouse(mousePos, col2) && statDeltas[i]>0) {
+                        levelCost -= player.getLevelCost(statDeltas[0]);
+                        statDeltas[0]--;
+                        statDeltas[i]--;
+                    }
+
+                    if(checkMouse(mousePos, col4)) {
+                        statDeltas[0]++;
+                        statDeltas[i]++;
+                        levelCost += player.getLevelCost(statDeltas[0]);
+                    }
+                }
+            }
+        }
+
+        if(game.getSubmitFlag()) {
+            submitLevelUp();
+            game.toggleSubmitFlag();
+        }
+    }
+
+    public void submitLevelUp() {
+        if(levelCost <= player.getTotalCurrency()) {
+            player.levelUp(statDeltas, levelCost);
+            levelCost = 0;
+            statDeltas = new List<int>();
+            for(int i=0; i<statNames.Count; i++) {
+                statDeltas.Add(0);
+            }
+        }
+    }
+
+    private void updateTravelTab() {
+        float colWidth = 225f;
+        float colHeight = 75f;
+        Rect col1 = new Rect(restMenuArea.x+restMenuArea.width*0.05f, restMenuTop.y+restMenuArea.width*0.05f, colWidth, colHeight);
+        Rect col2 = new Rect(col1.x+colWidth, col1.y, colWidth, colHeight);
+
+        if(Input.GetMouseButtonUp(0)) {
+            Vector3 mousePos = Input.mousePosition;
+
+            for(int i=0; i<areas.Count; i++) {
+                col1 = new Rect(col1.x, col1.y+colHeight, colWidth, colHeight);
+                if(checkMouse(mousePos, col1)) {
+                    currentArea = areas[i];
+                    locations = locationHandler.getLocations(currentArea);
+                }
+            }
+
+            for(int i=0; i<locations.Count; i++) {
+                col2 = new Rect(col2.x, col2.y+colHeight, colWidth, colHeight);
+                if(checkMouse(mousePos, col2)) {
+                    locationHandler.goTo(currentArea, locations[i]);
+                    game.toggleResting();
+                }
+            }
         }
     }
     
     private void drawRestMenu() {
-        if(game.playerResting()) {
+        if(discover) {
+            GUI.Label(new Rect(0, 0, Screen.width, Screen.height*0.9f), "SHRINE DISCOVERED", discoverStyle);
+        }
+        else if(game.playerResting()) {
             GUI.DrawTexture(restMenuArea, background);
             GUI.Label(restMenuTop, game.colorWord("exit"), currencyStyle);
 
@@ -215,7 +347,7 @@ public class MainGUI : MonoBehaviour
                     drawStatsTab();
                 }
                 else {
-
+                    drawTravelTab();
                 }
             }
             catch {
@@ -224,7 +356,66 @@ public class MainGUI : MonoBehaviour
         }
     }
 
-    private void drawStatsTab() {
-        
+    public void discoverTrigger() {
+        discover = true;
+        Invoke("toggleDiscover", 1.5f);
     }
+
+    private void toggleDiscover() {
+        discover = !discover;
+    }
+
+    private void drawStatsTab() {
+        float col1Width = 225f;
+        float colHeight = 75f;
+        Rect col1 = new Rect(restMenuArea.x+restMenuArea.width*0.05f, restMenuTop.y+restMenuArea.width*0.05f, col1Width, colHeight);
+        Rect col2 = new Rect(col1.x+col1Width, col1.y, colHeight, colHeight);
+        Rect col3 = new Rect(col2.x+colHeight, col2.y, colHeight, colHeight);
+        Rect col4 = new Rect(col3.x+colHeight, col3.y, colHeight, colHeight);
+
+        string stat = "";
+        for(int i=0; i<statNames.Count; i++) {
+            col1 = new Rect(col1.x, col1.y+colHeight, col1Width, colHeight);
+            GUI.Label(col1, statNames[i], menuStyle);
+
+            col3 = new Rect(col3.x, col3.y+colHeight, colHeight, colHeight);
+            if(statDeltas[i] > 0) {
+                if(levelCost<=player.getTotalCurrency())
+                    stat = "<color=green>"+(playerStats[i]+statDeltas[i])+"</color>";
+                else stat = "<color=red>"+(playerStats[i]+statDeltas[i])+"</color>";
+            }
+            else stat = "" + playerStats[i];
+            GUI.Label(col3, stat, menuStyle);
+
+            col2 = new Rect(col2.x, col2.y+colHeight, colHeight, colHeight);
+            col4 = new Rect(col4.x, col4.y+colHeight, colHeight, colHeight);
+            if(i>0 && i<statNames.Count-1) {
+                GUI.Label(col2, "-", menuStyle);
+                GUI.Label(col4, "+", menuStyle);
+            }
+        }
+    }
+
+    private void drawTravelTab() {
+        float colWidth = 225f;
+        float colHeight = 75f;
+        Rect col1 = new Rect(restMenuArea.x+restMenuArea.width*0.05f, restMenuTop.y+restMenuArea.width*0.05f, colWidth, colHeight);
+        Rect col2 = new Rect(col1.x+colWidth, col1.y, colWidth, colHeight);
+
+        for(int i=0; i<areas.Count; i++) {
+            col1 = new Rect(col1.x, col1.y+colHeight, colWidth, colHeight);
+            if(areas[i] != currentArea) GUI.DrawTexture(col1, background);
+            GUI.Label(col1, areas[i], menuStyle);
+        }
+
+        for(int i=0; i<locations.Count; i++) {
+            col2 = new Rect(col2.x, col2.y+colHeight, colWidth, colHeight);
+            GUI.Label(col2, locations[i], menuStyle);
+        }
+    }
+
+    //check button areas for click
+	bool checkMouse(Vector3 mousePos, Rect area) {
+		return mousePos.y < Screen.height-area.y && mousePos.y > Screen.height-(area.y + area.height) && mousePos.x > area.x && mousePos.x < area.x + area.width;
+	}
 }

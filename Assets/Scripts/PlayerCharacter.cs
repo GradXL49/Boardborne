@@ -61,6 +61,8 @@ public class PlayerCharacter : MonoBehaviour {
         strength = 5;
         endurance = 5;
         faith = 3;
+        currency = 0;
+        updateStats();
         
         healthFlasks = 2;
         staminaFlasks = 2;
@@ -68,15 +70,6 @@ public class PlayerCharacter : MonoBehaviour {
         items.Add(new HealthFlask(this, healthFlasks, Resources.Load("hflask") as Texture2D, Resources.Load("hflask-empty") as Texture2D));
         items.Add(new StaminaFlask(this, staminaFlasks, Resources.Load("sflask") as Texture2D, Resources.Load("sflask-empty") as Texture2D));
         currentItem = 0;
-
-        maxHealth = vitality * 10;
-        currentHealth = maxHealth/2;
-        maxStamina = endurance * 10;
-        currentStamina = maxStamina/2;
-        heal = faith*5;
-        maxMana = 20;
-        currentMana = maxMana;
-        currency = 0;
     }
 
     // Update is called once per frame
@@ -296,5 +289,35 @@ public class PlayerCharacter : MonoBehaviour {
         stats.Add(endurance);
         stats.Add(faith);
         return stats;
+    }
+
+    //handle level-up
+    public int getLevelCost(int n) {
+        return 100*(level+n);
+    }
+
+    public void levelUp(List<int> statDelta, int cost) {
+        currency -= cost;
+        level += statDelta[0];
+        vitality += statDelta[1];
+        strength += statDelta[2];
+        endurance += statDelta[3];
+        faith += statDelta[4];
+        updateStats();
+    }
+
+    public void gainFaith() {
+        faith++;
+        updateStats();
+    }
+
+    private void updateStats() {
+        maxHealth = vitality * 10;
+        currentHealth = maxHealth;
+        maxStamina = endurance * 10;
+        currentStamina = maxStamina;
+        heal = faith*5;
+        maxMana = 20;
+        currentMana = maxMana;
     }
 }

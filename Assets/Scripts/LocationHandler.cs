@@ -21,19 +21,29 @@ public class LocationHandler : MonoBehaviour
         
         areas = new List<string>();
         areas.Add("Church");
-        areas.Add("test");
 
         locations = new List<List<string>>();
         locations.Add(new List<string>());
         locations[0].Add("Altar");
-        locations.Add(new List<string>());
-        locations[1].Add("Test");
+        locations[0].Add("Basement");
+        locations[0].Add("Cathedral");
 
         visited = new List<List<bool>>();
         visited.Add(new List<bool>());
         visited[0].Add(true);
-        visited.Add(new List<bool>());
-        visited[1].Add(true);
+        for(int i=0; i<areas.Count; i++) {
+            if(i > 0) {
+                visited.Add(new List<bool>());
+                for(int j=0; j<locations[i].Count; j++) {
+                    visited[i].Add(false);
+                }
+            }
+            else {
+                for(int j=1; j<locations[i].Count; j++) {
+                    visited[i].Add(false);
+                }
+            }
+        }
 
         discoverStyle = new GUIStyle();
         discoverStyle.richText = true;
@@ -81,8 +91,9 @@ public class LocationHandler : MonoBehaviour
 
         foreach(GameObject o in respawns) {
             if(o.GetComponent<RestPlace>().name == location) {
-                player.rest(o.GetComponent<RestPlace>());
+                player.lastRestPlace = o.GetComponent<RestPlace>();
                 player.reset();
+                return;
             }
         }
     }

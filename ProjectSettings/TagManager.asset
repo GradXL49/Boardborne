@@ -3,7 +3,11 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - StairsUp1
+  - StairsDown1
+  - StairsUp2
+  - StairsDown2
   layers:
   - Default
   - TransparentFX

@@ -56,6 +56,8 @@ public class MainGUI : MonoBehaviour
     List<string> locations;
     string currentArea;
     LocationHandler locationHandler;
+
+    bool bossKill;
     
     // Start is called before the first frame update
     void Start()
@@ -120,6 +122,7 @@ public class MainGUI : MonoBehaviour
         statNames.Add("strength");
         statNames.Add("endurance");
         statNames.Add("faith");
+        statNames.Add("cost");
     }
 
     // Update is called once per frame
@@ -138,8 +141,8 @@ public class MainGUI : MonoBehaviour
         drawCurrencyArea();
         drawInventory();
         drawRestMenu();
-
         drawTyping();
+        drawBossKill();
     }
 
     void updateStatusBars() {
@@ -269,9 +272,10 @@ public class MainGUI : MonoBehaviour
                 col2 = new Rect(col2.x, col2.y+colHeight, colHeight, colHeight);
                 col4 = new Rect(col4.x, col4.y+colHeight, colHeight, colHeight);
 
-                if(i>0 && i<statNames.Count-1) {
+                if(i>0 && i<statNames.Count-2) {
                     if(checkMouse(mousePos, col2) && statDeltas[i]>0) {
                         levelCost -= player.getLevelCost(statDeltas[0]);
+                        statDeltas[statDeltas.Count-1] = levelCost;
                         statDeltas[0]--;
                         statDeltas[i]--;
                     }
@@ -280,6 +284,7 @@ public class MainGUI : MonoBehaviour
                         statDeltas[0]++;
                         statDeltas[i]++;
                         levelCost += player.getLevelCost(statDeltas[0]);
+                        statDeltas[statDeltas.Count-1] = levelCost;
                     }
                 }
             }
@@ -379,7 +384,15 @@ public class MainGUI : MonoBehaviour
             GUI.Label(col1, statNames[i], menuStyle);
 
             col3 = new Rect(col3.x, col3.y+colHeight, colHeight, colHeight);
-            if(statDeltas[i] > 0) {
+            if(i == statDeltas.Count-1) {
+                if(levelCost > 0) {
+                    if(levelCost<=player.getTotalCurrency())
+                        stat = "<color=green>"+(statDeltas[i])+"</color>";
+                    else stat = "<color=red>"+(statDeltas[i])+"</color>";
+                }
+                else stat = "" + statDeltas[i];
+            }
+            else if(statDeltas[i] > 0) {
                 if(levelCost<=player.getTotalCurrency())
                     stat = "<color=green>"+(playerStats[i]+statDeltas[i])+"</color>";
                 else stat = "<color=red>"+(playerStats[i]+statDeltas[i])+"</color>";
@@ -389,11 +402,16 @@ public class MainGUI : MonoBehaviour
 
             col2 = new Rect(col2.x, col2.y+colHeight, colHeight, colHeight);
             col4 = new Rect(col4.x, col4.y+colHeight, colHeight, colHeight);
-            if(i>0 && i<statNames.Count-1) {
+            if(i>0 && i<statNames.Count-2) {
                 GUI.Label(col2, "-", menuStyle);
                 GUI.Label(col4, "+", menuStyle);
             }
         }
+
+        Rect submit = new Rect(restMenuTop.x, restMenuTop.y+restMenuArea.height*0.9f, restMenuTop.width, restMenuTop.height);
+        if(levelCost>0 && levelCost<=player.getTotalCurrency())
+            GUI.Label(submit, game.colorWord("submit"), currencyStyle);
+        else GUI.Label(submit, "<color=grey>submit</color>", currencyStyle);
     }
 
     private void drawTravelTab() {
@@ -412,6 +430,20 @@ public class MainGUI : MonoBehaviour
             col2 = new Rect(col2.x, col2.y+colHeight, colWidth, colHeight);
             GUI.Label(col2, locations[i], menuStyle);
         }
+    }
+
+    private void drawBossKill() {
+        if(bossKill)
+            GUI.Label(new Rect(0, 0, Screen.width, Screen.height*0.9f), "ENEMY DELETED", discoverStyle);
+    }
+
+    public void bossKillTrigger() {
+        bossKill = true;
+        Invoke("toggleBossKill", 2.5f);
+    }
+
+    private void toggleBossKill() {
+        bossKill = !bossKill;
     }
 
     //check button areas for click

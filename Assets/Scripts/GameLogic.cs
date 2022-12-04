@@ -37,6 +37,7 @@ public class GameLogic : MonoBehaviour
     void Start()
     {
         player = GameObject.Find("HeroKnight").GetComponent<PlayerCharacter>();
+        player.transform.SetPositionAndRotation(new Vector3(currentLocation.transform.position.x, currentLocation.transform.position.y, transform.position.z), transform.rotation);
         wordService = GameObject.Find("GameLogic").GetComponent<WordService>();
         locationHandler = GameObject.Find("GameLogic").GetComponent<LocationHandler>();
         typing = "";
@@ -103,12 +104,18 @@ public class GameLogic : MonoBehaviour
             }
         }
         else {
-            if(currentLocation.GetType()==typeof(EnemyLocation) && !((EnemyLocation)currentLocation).enemy.isDead() && !player.isDead()) {
+            if(!player.isMoving() && currentLocation.GetType()==typeof(EnemyLocation) && !((EnemyLocation)currentLocation).enemy.isDead() && !player.isDead()) {
                 combat();
             }
             else {
                 if(currentLocation.GetType() == typeof(RestPlace)) {
                     rest();
+                }
+                else if(currentLocation.GetType()==typeof(ItemLocation)) {
+                    if(!((ItemLocation)currentLocation).isTaken() && typing=="take") {
+                        ((ItemLocation)currentLocation).take();
+                        typing = "";
+                    }
                 }
 
                 for(int i=0; i<currentLocation.childWords.Count; i++) {
@@ -142,9 +149,13 @@ public class GameLogic : MonoBehaviour
 
     //set location and check for child words
     public void setLocation(Location l) {
+        if(currentLocation.GetType() == typeof(ChoiceLocation)) ((ChoiceLocation)currentLocation).triggerActivation();
+        
         if(!l.hasChildWords()) {
             l.setChildWords(wordService.getWords(l.children.Count));
         }
+
+        if(l.GetType() == typeof(ChoiceLocation)) ((ChoiceLocation)l).triggerActivation();
 
         currentLocation = l;
     }
@@ -214,6 +225,7 @@ public class GameLogic : MonoBehaviour
 
     public void toggleResting() {
         resting = !resting;
+        setLocation(player.lastRestPlace);
     }
 
     public List<string> getRestTabs() {
@@ -227,6 +239,8 @@ public class GameLogic : MonoBehaviour
     //combat logic
     private void combat() {
         if(fighting == false) {
+            player.setFacing(1);
+            
             if(combatWord == null) {
                 getCombatWord();
                 combatTimerLength = combatWord.Length * ((EnemyLocation)currentLocation).enemy.timeFactor;
@@ -377,6 +391,12 @@ public class GameLogic : MonoBehaviour
             Rect temp = new Rect(statue.x-10, Screen.height-(statue.y+90), 20, 20);
 
             drawLocation(temp, "rest");
+        }
+        else if(currentLocation.GetType() == typeof(ItemLocation) && !((ItemLocation)currentLocation).isTaken()) {
+            Vector3 item = ((ItemLocation)currentLocation).getItemLocation();
+            Rect temp = new Rect(item.x-10, Screen.height-(item.y+90), 20, 20);
+
+            drawLocation(temp, "take");
         }
     }
 }

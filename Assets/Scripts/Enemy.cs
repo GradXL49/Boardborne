@@ -5,22 +5,26 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     //variables
-    PlayerCharacter player;
-    [SerializeField] int health;
-    int maxHealth;
-    [SerializeField] int damage;
-    [SerializeField] int reward;
+    protected PlayerCharacter player;
+    [SerializeField] protected  int health;
+    protected int maxHealth;
+    [SerializeField] protected  int damage;
+    [SerializeField] protected int reward;
     public float timeFactor;
-    int startReward;
+    protected int startReward;
 
-    [SerializeField] Animator m_animator;
+    [SerializeField] protected Animator m_animator;
     Vector3 start;
-    [SerializeField] CircleCollider2D collider;
+    [SerializeField] protected CircleCollider2D collider;
+
+    MainGUI gui;
+    [SerializeField] bool boss;
     
     // Start is called before the first frame update
     void Start()
     {
         player = GameObject.Find("HeroKnight").GetComponent<PlayerCharacter>();
+        gui =  GameObject.Find("GameLogic").GetComponent<MainGUI>();
         start = transform.position;
 
         maxHealth = health;
@@ -48,9 +52,10 @@ public class Enemy : MonoBehaviour
         if(player.isDead()) reward = startReward + player.punish();
     }
 
-    private void die() {
+    protected void die() {
         player.getReward(reward);
         if(collider != null) InvokeRepeating("fall", 0, 0.1f);
+        if(boss) gui.bossKillTrigger();
     }
 
     private void fall() {

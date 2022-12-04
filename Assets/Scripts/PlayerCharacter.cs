@@ -102,17 +102,7 @@ public class PlayerCharacter : MonoBehaviour {
         }
 
         // Swap direction of sprite depending on walk direction
-        if (inputX > 0)
-        {
-            GetComponent<SpriteRenderer>().flipX = false;
-            m_facingDirection = 1;
-        }
-            
-        else if (inputX < 0)
-        {
-            GetComponent<SpriteRenderer>().flipX = true;
-            m_facingDirection = -1;
-        }
+        setFacing(inputX);
 
         // Move
         if (!m_rolling )
@@ -136,6 +126,18 @@ public class PlayerCharacter : MonoBehaviour {
             m_delayToIdle -= Time.deltaTime;
                 if(m_delayToIdle < 0)
                     m_animator.SetInteger("AnimState", 0);
+        }
+    }
+
+    //set facing direction
+    public void setFacing(float d) {
+        if(d > 0) {
+            GetComponent<SpriteRenderer>().flipX = false;
+            m_facingDirection = 1;
+        }
+        else if(d < 0) {
+            GetComponent<SpriteRenderer>().flipX = true;
+            m_facingDirection = -1;
         }
     }
 
@@ -278,6 +280,17 @@ public class PlayerCharacter : MonoBehaviour {
     //get inventory
     public List<Item> getItems() {
         return items;
+    }
+
+    public void addItem(string itemType, int quantity) {
+        if(itemType == "health_flask") {
+            healthFlasks += quantity;
+            items[0].give(quantity);
+        }
+        else if(itemType == "stamina_flask") {
+            staminaFlasks += quantity;
+            items[1].give(quantity);
+        }
     }
 
     //get current stats

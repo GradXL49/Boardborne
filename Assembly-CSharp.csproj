@@ -43,11 +43,13 @@
      <Compile Include="Assets\Artwork\Hero Knight - Pixel Art\Demo\HeroKnight.cs" />
      <Compile Include="Assets\Artwork\Hero Knight - Pixel Art\Demo\Sensor_HeroKnight.cs" />
      <Compile Include="Assets\Scripts\CameraController.cs" />
+     <Compile Include="Assets\Scripts\ChoiceLocation.cs" />
      <Compile Include="Assets\Scripts\Enemy.cs" />
      <Compile Include="Assets\Scripts\EnemyLocation.cs" />
      <Compile Include="Assets\Scripts\GameLogic.cs" />
      <Compile Include="Assets\Scripts\HealthFlask.cs" />
      <Compile Include="Assets\Scripts\Item.cs" />
+     <Compile Include="Assets\Scripts\ItemLocation.cs" />
      <Compile Include="Assets\Scripts\Location.cs" />
      <Compile Include="Assets\Scripts\LocationHandler.cs" />
      <Compile Include="Assets\Scripts\MainGUI.cs" />
